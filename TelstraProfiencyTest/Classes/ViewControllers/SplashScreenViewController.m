@@ -52,6 +52,8 @@
     
     NSError* error = nil;
     NSURL *url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/s/g41ldl6t0afw9dv/facts.json"];
+   // url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/s/qo72c8fcolsqmq6/facts%20%282%29.json?dl=0"];
+    
     NSStringEncoding encoding;
     NSString *urlContents = [NSString stringWithContentsOfURL:url usedEncoding:&encoding error:&error
                              ];

@@ -73,6 +73,9 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://dl.dropboxusercontent.com/s/g41ldl6t0afw9dv/facts.json"] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10.0];
     
     
+    //request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://dl.dropboxusercontent.com/s/qo72c8fcolsqmq6/facts%20%282%29.json?dl=0"] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10.0];
+    
+    
     // alloc+init and start an NSURLConnection; release on completion/failure
     NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     self.jsonConnection = conn;
