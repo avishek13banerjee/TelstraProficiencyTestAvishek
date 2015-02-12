@@ -64,7 +64,7 @@
     }
     NSData* data = [NSData dataWithContentsOfURL:url options:NSDataReadingUncached error:&error];
     
-    NSArray *array =[[NSArray alloc]init];
+    NSDictionary *array =[[NSDictionary alloc]init];
     array = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error]; // Try to convert your data
     if (!array && error && [error.domain isEqualToString:NSCocoaErrorDomain] && (error.code == NSPropertyListReadCorruptError)) {
         // Encoding issue, try Latin-1
@@ -93,7 +93,7 @@
         
     }
     
-    NSLog(@"News model details %d",newsModelArray.count);
+    
     
     AppHandler *apphandler = [AppHandler sharedManager];
     apphandler.titleString = title;

@@ -154,10 +154,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
         
         
     }
-    
-    if(expectedLabelSize.height!=0){
-        float totalHeight = expectedAnotherSize.height + expectedLabelSize.height;
-    }
+
     
 
     

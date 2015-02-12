@@ -21,7 +21,7 @@
     self.window.backgroundColor = [UIColor whiteColor];
     self.splashScreen = [[SplashScreenViewController alloc]init];
     self.window.rootViewController = self.splashScreen;
-    AppHandler *handler = [AppHandler sharedManager];
+    
     [self.window makeKeyAndVisible];
     
     return YES;
