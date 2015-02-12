@@ -187,8 +187,10 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     
 
     if([cell.contentView viewWithTag:2] == nil){
-    UILabel *descriptionLabel =[[UILabel alloc]initWithFrame:CGRectMake(10, [cell.contentView viewWithTag:1 ].frame.origin.y + [cell.contentView viewWithTag:1 ].frame.size.height+10, cell.frame.size.width-120, expectedAnotherSize.height+20.0)];
+    UILabel *descriptionLabel =[[UILabel alloc]initWithFrame:CGRectMake(10, [cell.contentView viewWithTag:1 ].frame.origin.y + [cell.contentView viewWithTag:1 ].frame.size.height+10, cell.frame.size.width-130, expectedAnotherSize.height+20.0)];
     
+        [descriptionLabel setBackgroundColor:[UIColor clearColor]];
+        
     [descriptionLabel setLineBreakMode:NSLineBreakByWordWrapping];
     if(!(news.description == (id)[NSNull null] || news.description.length == 0 ))
         [descriptionLabel setText:news.description];
@@ -212,7 +214,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
         else
             [(UILabel *)[cell.contentView viewWithTag:2] setText:@"No Description"];
              
-        [(UILabel *)[cell.contentView viewWithTag:2] setFrame:CGRectMake(10, [cell.contentView viewWithTag:1 ].frame.origin.y + [cell.contentView viewWithTag:1 ].frame.size.height+10, cell.frame.size.width-120, expectedAnotherSize.height+20.0)];
+        [(UILabel *)[cell.contentView viewWithTag:2] setFrame:CGRectMake(10, [cell.contentView viewWithTag:1 ].frame.origin.y + [cell.contentView viewWithTag:1 ].frame.size.height+10, cell.frame.size.width-130, expectedAnotherSize.height+20.0)];
         
     
     }
@@ -220,7 +222,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     UIImageView *imageView;
     
     if([cell.contentView viewWithTag:3] == nil){
-        imageView  = [[UIImageView alloc]initWithFrame:CGRectMake([cell.contentView viewWithTag:2].frame.origin.x + [cell.contentView viewWithTag:2].frame.size.width, 30, 100, 100)];
+        imageView  = [[UIImageView alloc]initWithFrame:CGRectMake([cell.contentView viewWithTag:2].frame.origin.x + [cell.contentView viewWithTag:2].frame.size.width+50, 30, 100, 100)];
         imageView.tag = 3;
         
         [cell.contentView addSubview:imageView];
@@ -243,9 +245,13 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
         else{
     
         
-        if (self.newsTable.dragging == NO && self.newsTable.decelerating == NO)
+            
+        //if (self.newsTable.dragging == NO && self.newsTable.decelerating == NO)
         {
+            [(UIImageView *)[cell.contentView viewWithTag:3] setImage:[UIImage imageNamed:@"placeholder"]];
             [self startIconDownload:news forIndexPath:indexPath];
+            if(news.hasNewsImageDownloadFailed)
+             [(UIImageView *)[cell.contentView viewWithTag:3] setImage:[UIImage imageNamed:@"placeholderFailed"]];
         }
         }
         

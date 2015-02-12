@@ -10,7 +10,7 @@
 
 @implementation NewsModel
 
-@synthesize title,description,imageReference,newsImage;
+@synthesize title,description,imageReference,newsImage,hasNewsImageDownloadFailed;
 
 @end
 

@@ -21,6 +21,7 @@
 @property (nonatomic,strong)NSString *description;
 @property (nonatomic,strong)NSString *imageReference;
 @property (nonatomic, strong) UIImage *newsImage;
+@property (nonatomic) BOOL hasNewsImageDownloadFailed;
 
 
 

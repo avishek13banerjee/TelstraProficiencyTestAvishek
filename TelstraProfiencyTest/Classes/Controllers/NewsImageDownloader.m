@@ -62,6 +62,9 @@
     
     // Release the connection now that it's finished
     self.imageConnection = nil;
+    
+    self.news.hasNewsImageDownloadFailed = TRUE;
+    
 }
 
 // -------------------------------------------------------------------------------
