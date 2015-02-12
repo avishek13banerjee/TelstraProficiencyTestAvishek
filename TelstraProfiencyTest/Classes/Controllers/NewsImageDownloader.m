@@ -23,10 +23,11 @@
 {
     self.activeDownload = [NSMutableData data];
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.news.imageReference]];
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.news.imageReference] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10.0];
     
     // alloc+init and start an NSURLConnection; release on completion/failure
     NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    
     
     self.imageConnection = conn;
 }

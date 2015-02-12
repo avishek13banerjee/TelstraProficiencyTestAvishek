@@ -97,7 +97,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
                                             lineBreakMode:NSLineBreakByWordWrapping];
     }
     
-    maximumLabelSize = CGSizeMake(200,400);
+    maximumLabelSize = CGSizeMake(200,9999);
     if(!(newsModel.description == (id)[NSNull null] || newsModel.description.length == 0 )){
         
         expectedAnotherSize =[newsModel.description sizeWithFont:font1
@@ -109,7 +109,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     if(expectedLabelSize.height!=0){
         totalHeight = expectedAnotherSize.height + expectedLabelSize.height+30.0f;
         if(totalHeight >110.0)
-            return totalHeight;
+            return (totalHeight+20);
         else {
             if((!(newsModel.imageReference == (id)[NSNull null] || newsModel.imageReference.length == 0 )))
                 return 150.0f;
@@ -146,11 +146,13 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
                                        lineBreakMode:NSLineBreakByWordWrapping];
     }
     
-    maximumLabelSize = CGSizeMake(200,400);
+    maximumLabelSize = CGSizeMake(200,9999);
     if(!(news.description == (id)[NSNull null] || news.description.length == 0 )){
         expectedAnotherSize =[news.description sizeWithFont:font1
                                           constrainedToSize:maximumLabelSize
                                               lineBreakMode:NSLineBreakByWordWrapping];
+        
+        
     }
     
     if(expectedLabelSize.height!=0){
@@ -222,7 +224,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     UIImageView *imageView;
     
     if([cell.contentView viewWithTag:3] == nil){
-        imageView  = [[UIImageView alloc]initWithFrame:CGRectMake([cell.contentView viewWithTag:2].frame.origin.x + [cell.contentView viewWithTag:2].frame.size.width+50, 30, 100, 100)];
+        imageView  = [[UIImageView alloc]initWithFrame:CGRectMake([cell.contentView viewWithTag:2].frame.origin.x + [cell.contentView viewWithTag:2].frame.size.width+10, 30, 100, 100)];
         imageView.tag = 3;
         
         [cell.contentView addSubview:imageView];
