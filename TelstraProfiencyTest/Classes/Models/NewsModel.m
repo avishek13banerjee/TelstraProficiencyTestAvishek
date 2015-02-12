@@ -1,15 +1,16 @@
 //
-//  ViewController.h
+//  NewsModel.m
 //  TelstraProfiencyTest
 //
 //  Created by Avishek Banerjee on 12/02/2015.
 //  Copyright (c) 2015 Cognizant. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "NewsModel.h"
 
-@interface ViewController : UIViewController
+@implementation NewsModel
 
+@synthesize title,description,imageReference;
 
 @end
 
