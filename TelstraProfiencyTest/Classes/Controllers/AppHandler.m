@@ -21,7 +21,10 @@
 }
 
 -(id)initWithValues{
-    self.newsModelArray = [[NSMutableArray alloc]init];
+    self = [super init];
+    if (self) {
+      self.newsModelArray = [[[NSMutableArray alloc]init] autorelease];
+    }
     return  self;
 }
 
@@ -31,10 +34,7 @@
     
     [super dealloc];
     
-    if(self.newsModelArray){
-           [self.newsModelArray release];
-            self.newsModelArray = nil;
-    }
+    
     
     
 

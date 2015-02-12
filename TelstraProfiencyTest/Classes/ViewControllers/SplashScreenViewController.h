@@ -13,5 +13,7 @@
 
 
 @interface SplashScreenViewController : UIViewController
+@property (nonatomic,strong) NSMutableArray *newsModelArray;
+
 
 @end

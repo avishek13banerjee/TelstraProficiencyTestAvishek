@@ -45,7 +45,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     apphandler = [AppHandler sharedManager];
     refreshControl = [[UIRefreshControl alloc] init];
     [refreshControl addTarget:self action:@selector(refresh) forControlEvents:UIControlEventValueChanged];
-    refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:@"Pull to refresh"];
+    refreshControl.attributedTitle = [[[NSAttributedString alloc] initWithString:@"Pull to refresh"] autorelease];
     refreshControl.tintColor = [UIColor lightGrayColor];
     [newsTable addSubview:refreshControl];
     
@@ -75,11 +75,92 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     
     //request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://dl.dropboxusercontent.com/s/qo72c8fcolsqmq6/facts%20%282%29.json?dl=0"] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10.0];
     
+
     
-    // alloc+init and start an NSURLConnection; release on completion/failure
-    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    self.jsonConnection = conn;
-    [conn start];
+    
+    NSOperationQueue *queue = [[NSOperationQueue alloc]init];
+    
+    [NSURLConnection sendAsynchronousRequest:request
+                                       queue:queue
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+                               if (error) {
+                                   
+                                   NSLog(@"error:%@", error.localizedDescription);
+                                   
+                                       // Clear the activeDownload property to allow later attempts
+                                       self.jsonDownload = nil;
+                                       
+                                       // Release the connection now that it's finished
+                                       
+                                   
+                                       self.jsonDownload = nil;
+                                       
+                               }
+                               else
+                               {
+                                   // Set appIcon and clear temporary data/image
+                                   NSError *error = nil;
+                                   
+                                   NSDictionary *array ;
+                                   array = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error]; // Try to convert your data
+                                   if (!array && error && [error.domain isEqualToString:NSCocoaErrorDomain] && (error.code == NSPropertyListReadCorruptError)) {
+                                       // Encoding issue, try Latin-1
+                                       NSString *jsonString = [[[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding] autorelease];
+                                       if (jsonString) {
+                                           // Need to re-encode as UTF8 to parse
+                                           array = [NSJSONSerialization JSONObjectWithData:
+                                                    [jsonString dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES]
+                                                                                   options:0 error:&error];
+                                       }
+                                   }
+                                   
+                                   NSString *title = [array objectForKey:@"title"];
+                                   
+                                   NSArray *rows = [array objectForKey:@"rows"];
+                                   
+                                   if (rows.count>0) {
+                                       [newsModelArray removeAllObjects];
+                                       
+                                       for (int i = 0; i<rows.count; i++) {
+                                           NSDictionary *detailDictionary = [rows objectAtIndex:i];
+                                           NewsModel *newsModel = [[NewsModel alloc]init];
+                                           newsModel.title = [detailDictionary objectForKey:@"title"];
+                                           newsModel.description = [detailDictionary objectForKey:@"description"];
+                                           newsModel.imageReference = [detailDictionary objectForKey:@"imageHref"];
+                                           
+                                           if(!(newsModel.imageReference == (id)[NSNull null] || newsModel.imageReference.length == 0 ) || !(newsModel.title == (id)[NSNull null] || newsModel.title.length == 0 ) || !(newsModel.description == (id)[NSNull null] || newsModel.description.length == 0 ))
+                                               [newsModelArray addObject:newsModel];
+                                           
+                                           
+                                           [newsModel release];
+                                           newsModel = nil;
+                                           
+                                       }
+                                       
+                                       
+                                       
+                                       apphandler = [AppHandler sharedManager];
+                                       apphandler.titleString = title;
+                                       apphandler.newsModelArray = [newsModelArray retain];
+                                       
+                                   }
+                                   
+                                   
+                                   
+                                   
+                                   //self.jsonDownload = nil;
+                                   
+                                   [self.newsTable reloadData];
+                                   //[self.newsTable setAlpha:0.2];
+                                   
+                                   
+                                   
+                                   
+                                   
+                                   
+                               }
+                               
+                           }];
     
     
     
@@ -130,7 +211,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
                                                    lineBreakMode:NSLineBreakByWordWrapping];
     }
     
-    float totalHeight;
+    float totalHeight = 0;
     if(expectedLabelSize.height!=0){
         totalHeight = expectedAnotherSize.height + expectedLabelSize.height+30.0f;
         if(totalHeight >110.0)
@@ -156,7 +237,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     
     if(cell == nil)
     {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"newsCell"];
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"newsCell"] autorelease];
         cell.backgroundColor =  [UIColor clearColor];
     }
     NewsModel *news = [apphandler.newsModelArray objectAtIndex:indexPath.row];
@@ -185,7 +266,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     
     
     if([cell.contentView viewWithTag:1] == nil){
-    UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(10, 5, cell.frame.size.width-40, expectedLabelSize.height)];
+    UILabel *titleLabel = [[[UILabel alloc]initWithFrame:CGRectMake(10, 5, cell.frame.size.width-40, expectedLabelSize.height)] autorelease];
     [titleLabel setLineBreakMode:NSLineBreakByWordWrapping];
     [titleLabel setFont:[UIFont boldSystemFontOfSize:18.0f]];
     [titleLabel setTextColor:[UIColor blueColor]];
@@ -195,6 +276,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
         
         
         [cell.contentView addSubview:titleLabel];
+        
         
     }
     
@@ -211,7 +293,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     
 
     if([cell.contentView viewWithTag:2] == nil){
-    UILabel *descriptionLabel =[[UILabel alloc]initWithFrame:CGRectMake(10, [cell.contentView viewWithTag:1 ].frame.origin.y + [cell.contentView viewWithTag:1 ].frame.size.height+10, cell.frame.size.width-130, expectedAnotherSize.height+20.0)];
+    UILabel *descriptionLabel =[[[UILabel alloc]initWithFrame:CGRectMake(10, [cell.contentView viewWithTag:1 ].frame.origin.y + [cell.contentView viewWithTag:1 ].frame.size.height+10, cell.frame.size.width-130, expectedAnotherSize.height+20.0)] autorelease];
     
         [descriptionLabel setBackgroundColor:[UIColor clearColor]];
         
@@ -228,6 +310,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
         
 
         [cell.contentView addSubview:descriptionLabel];
+
     }
     
     else{
@@ -246,7 +329,7 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     UIImageView *imageView;
     
     if([cell.contentView viewWithTag:3] == nil){
-        imageView  = [[UIImageView alloc]initWithFrame:CGRectMake([cell.contentView viewWithTag:2].frame.origin.x + [cell.contentView viewWithTag:2].frame.size.width+10, 30, 100, 100)];
+        imageView  = [[[UIImageView alloc]initWithFrame:CGRectMake([cell.contentView viewWithTag:2].frame.origin.x + [cell.contentView viewWithTag:2].frame.size.width+10, 30, 100, 100)] autorelease];
         imageView.tag = 3;
         
         [cell.contentView addSubview:imageView];
@@ -322,96 +405,9 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
 }
 
 
-#pragma mark - NSURLConnectionDelegate
-
-// -------------------------------------------------------------------------------
-//	Downloading Data and appending to image
-// -------------------------------------------------------------------------------
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
-{
-    [self.jsonDownload appendData:data];
-}
-
-// -------------------------------------------------------------------------------
-//	reflush
-// -------------------------------------------------------------------------------
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
-    // Clear the activeDownload property to allow later attempts
-    self.jsonDownload = nil;
-    
-    // Release the connection now that it's finished
-    
-    [self.jsonDownload release];
-    self.jsonDownload = nil;
 
 
-    
-    
-   
-    
-}
 
-// -------------------------------------------------------------------------------
-//	connectionDidFinishLoading:connection
-// -------------------------------------------------------------------------------
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
-    // Set appIcon and clear temporary data/image
-    NSError *error = nil;
-    
-    NSDictionary *array =[[NSDictionary alloc]init];
-    array = [NSJSONSerialization JSONObjectWithData:self.jsonDownload options:NSJSONReadingMutableContainers error:&error]; // Try to convert your data
-    if (!array && error && [error.domain isEqualToString:NSCocoaErrorDomain] && (error.code == NSPropertyListReadCorruptError)) {
-        // Encoding issue, try Latin-1
-        NSString *jsonString = [[NSString alloc] initWithData:self.jsonDownload encoding:NSISOLatin1StringEncoding];
-        if (jsonString) {
-            // Need to re-encode as UTF8 to parse
-            array = [NSJSONSerialization JSONObjectWithData:
-                     [jsonString dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES]
-                                                    options:0 error:&error];
-        }
-    }
-    
-    NSString *title = [array objectForKey:@"title"];
-    
-    NSArray *rows = [array objectForKey:@"rows"];
-    
-    if (rows.count>0) {
-        [newsModelArray removeAllObjects];
-    
-    for (int i = 0; i<rows.count; i++) {
-        NSDictionary *detailDictionary = [rows objectAtIndex:i];
-        NewsModel *newsModel = [[NewsModel alloc]init];
-        newsModel.title = [detailDictionary objectForKey:@"title"];
-        newsModel.description = [detailDictionary objectForKey:@"description"];
-        newsModel.imageReference = [detailDictionary objectForKey:@"imageHref"];
-        
-        if(!(newsModel.imageReference == (id)[NSNull null] || newsModel.imageReference.length == 0 ) || !(newsModel.title == (id)[NSNull null] || newsModel.title.length == 0 ) || !(newsModel.description == (id)[NSNull null] || newsModel.description.length == 0 ))
-            [newsModelArray addObject:newsModel];
-        
-    }
-    
-    
-    
-    apphandler = [AppHandler sharedManager];
-    apphandler.titleString = title;
-    apphandler.newsModelArray = [newsModelArray retain];
-
-    }
-    
-    
-    
-    
-    //self.jsonDownload = nil;
-    
-    [self.newsTable reloadData];
-    
-    
-    
-    
-    
-}
 
 
 
@@ -423,6 +419,11 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     if(refreshControl != nil)
         [refreshControl release];
     refreshControl  = nil;
+    if(self.newsTable)
+        self.newsTable = nil;
+    
+    
+    
 }
 
 

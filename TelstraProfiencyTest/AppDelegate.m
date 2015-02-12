@@ -54,8 +54,15 @@
     
     [super dealloc];
     if(self.splashScreen != nil)
-        [self.splashScreen release];
+        
     self.splashScreen = nil;
+    if(self.window){
+       
+        self.window = nil;
+        
+        
+    }
+    
     
 }
 @end

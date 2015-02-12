@@ -74,7 +74,7 @@
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     // Set appIcon and clear temporary data/image
-    UIImage *image = [[UIImage alloc] initWithData:self.activeDownload];
+    UIImage *image = [[[UIImage alloc] initWithData:self.activeDownload] autorelease];
     
     if (image.size.width != 100 || image.size.height != 100)
     {

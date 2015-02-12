@@ -9,7 +9,7 @@
 #import "SplashScreenViewController.h"
 
 @interface SplashScreenViewController (){
-    NSMutableArray *newsModelArray;
+    
     UIActivityIndicatorView *activityIndicatorView;
 }
 @end
@@ -30,18 +30,19 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    if(newsModelArray == nil)
-        newsModelArray = [[NSMutableArray alloc]init];
-    activityIndicatorView = [[UIActivityIndicatorView alloc]initWithFrame:CGRectMake(self.view.frame.size.width/2-20, self.view.frame.size.height/2 - 20, 20, 20)];
+    if(self.newsModelArray == nil)
+        self.newsModelArray = [[NSMutableArray alloc]init];
+    activityIndicatorView = [[[UIActivityIndicatorView alloc]initWithFrame:CGRectMake(self.view.frame.size.width/2-20, self.view.frame.size.height/2 - 20, 20, 20)] autorelease];
     
     //[activityIndicatorView setTintColor:[UIColor blueColor]];
     [activityIndicatorView setOpaque:YES];
     
-    [self.view setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"TelstraIMAGE.jpg"]]];
-    UIImageView *backGroundImage = [[UIImageView alloc]initWithFrame:self.view.frame];
+    //[self.view setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"TelstraBG"]]];
+    UIImageView *backGroundImage = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, 200, 200)];
+    
     [backGroundImage setImage:[UIImage imageNamed:@"TelstraIMAGE.jpg"]];
-    [self.view addSubview:backGroundImage];
-    [backGroundImage release];
+    //[self.view addSubview:backGroundImage];
+    //[backGroundImage release];
     [self.view addSubview:activityIndicatorView];
     [activityIndicatorView startAnimating];
     
@@ -66,11 +67,13 @@
     }
     NSData* data = [NSData dataWithContentsOfURL:url options:NSDataReadingUncached error:&error];
     
-    NSDictionary *array =[[NSDictionary alloc]init];
+    if(data){
+    NSDictionary *array;
+    
     array = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error]; // Try to convert your data
     if (!array && error && [error.domain isEqualToString:NSCocoaErrorDomain] && (error.code == NSPropertyListReadCorruptError)) {
         // Encoding issue, try Latin-1
-        NSString *jsonString = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
+        NSString *jsonString = [[[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding] autorelease];
         if (jsonString) {
             // Need to re-encode as UTF8 to parse
             array = [NSJSONSerialization JSONObjectWithData:
@@ -91,7 +94,7 @@
         newsModel.imageReference = [detailDictionary objectForKey:@"imageHref"];
         
         if(!(newsModel.imageReference == (id)[NSNull null] || newsModel.imageReference.length == 0 ) || !(newsModel.title == (id)[NSNull null] || newsModel.title.length == 0 ) || !(newsModel.description == (id)[NSNull null] || newsModel.description.length == 0 ))
-            [newsModelArray addObject:newsModel];
+            [self.newsModelArray addObject:newsModel];
         
     }
     
@@ -99,16 +102,30 @@
     
     AppHandler *apphandler = [AppHandler sharedManager];
     apphandler.titleString = title;
-    apphandler.newsModelArray = [newsModelArray retain];
+    apphandler.newsModelArray = [self.newsModelArray retain];
     
     [self performSelector:@selector(presentNext) withObject:nil afterDelay:0.5];
+    }
+    
+    else
+    {
+    
+        UIAlertView *errorAlert = [[[UIAlertView alloc]initWithTitle:@"Error" message:@"An error occured while downloading data for the first time." delegate:self cancelButtonTitle:@"Try Again" otherButtonTitles:nil] autorelease];
+        [errorAlert show];
+        
+    
+    }
 }
 
 -(void)presentNext{
-    NewsFeedViewController  *newsFeed = [[NewsFeedViewController alloc]init];
+    NewsFeedViewController  *newsFeed = [[[NewsFeedViewController alloc]init] autorelease];
     [activityIndicatorView stopAnimating];
     UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:newsFeed];
+    
     [self presentViewController:nav animated:YES completion:nil];
+    [nav release];
+    nav = nil;
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -116,11 +133,21 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex{
+
+    if(buttonIndex == 0)
+    {
+    [self networkManagerFetchJson];
+    }
+
+}
+
+
 -(void)dealloc {
     [super dealloc];
-    if(activityIndicatorView != nil)
-        [activityIndicatorView release];
-    activityIndicatorView = nil;
+    
+
 }
 
 @end
