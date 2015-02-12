@@ -12,7 +12,10 @@ static NSString *CellIdentifier = @"NewsCell";
 static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
 @interface NewsFeedViewController (){
     UIRefreshControl *refreshControl;
+    
 }
+// the set of NewsImageDownloader objects for each NewsObject
+@property (nonatomic, strong) NSMutableDictionary *imageDownloadsInProgress;
 @end
 
 @implementation NewsFeedViewController
@@ -202,20 +205,54 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     }
     
     else{
-        [(UILabel *)[cell.contentView viewWithTag:2] setText:news.description];
+        
+        if(!(news.description == (id)[NSNull null] || news.description.length == 0 ))
+            [(UILabel *)[cell.contentView viewWithTag:2] setText:news.description];
+        
+        else
+            [(UILabel *)[cell.contentView viewWithTag:2] setText:@"No Description"];
+             
         [(UILabel *)[cell.contentView viewWithTag:2] setFrame:CGRectMake(10, [cell.contentView viewWithTag:1 ].frame.origin.y + [cell.contentView viewWithTag:1 ].frame.size.height+10, cell.frame.size.width-120, expectedAnotherSize.height+20.0)];
         
     
     }
     
+    UIImageView *imageView;
     
-    
-    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake([cell.contentView viewWithTag:2].frame.origin.x + [cell.contentView viewWithTag:1].frame.size.width, 30, 100, 100)];
-    if(!(news.imageReference == (id)[NSNull null] || news.imageReference.length == 0 ))
-        
+    if([cell.contentView viewWithTag:3] == nil){
+        imageView  = [[UIImageView alloc]initWithFrame:CGRectMake([cell.contentView viewWithTag:2].frame.origin.x + [cell.contentView viewWithTag:2].frame.size.width, 30, 100, 100)];
         imageView.tag = 3;
+        
+        [cell.contentView addSubview:imageView];
+        
+    }
     
-    [[cell.contentView viewWithTag:1] setBackgroundColor:[UIColor clearColor]];
+    
+        
+    if(news.newsImage){
+    
+        [(UIImageView *)[cell.contentView viewWithTag:3] setImage:news.newsImage];
+        [[cell.contentView viewWithTag:3] setHidden:NO];
+    
+    }
+    else{
+    
+        if((news.imageReference == (id)[NSNull null] || news.imageReference.length == 0 ))
+           [[cell.contentView viewWithTag:3] setHidden:YES];
+        
+        else{
+    
+        
+        if (self.newsTable.dragging == NO && self.newsTable.decelerating == NO)
+        {
+            [self startIconDownload:news forIndexPath:indexPath];
+        }
+        }
+        
+    }
+    
+    [[cell.contentView viewWithTag:3] setBackgroundColor:[UIColor clearColor]];
+    
     
 
     [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
@@ -224,6 +261,36 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
     
     return  cell;
 }
+
+// -------------------------------------------------------------------------------
+//	startIconDownload:forIndexPath:
+// -------------------------------------------------------------------------------
+- (void)startIconDownload:(NewsModel *)news forIndexPath:(NSIndexPath *)indexPath
+{
+    NewsImageDownloader *newsImageDownloader = (self.imageDownloadsInProgress)[indexPath];
+    if (newsImageDownloader == nil)
+    {
+        newsImageDownloader = [[NewsImageDownloader alloc] init];
+        newsImageDownloader.news = news;
+        [newsImageDownloader setCompletionHandler:^{
+            
+            UITableViewCell *cell = [newsTable cellForRowAtIndexPath:indexPath];
+            
+            // Display the newly loaded image
+            [(UIImageView *)[cell.contentView viewWithTag:3] setImage:news.newsImage];
+            [(UIImageView *)[cell.contentView viewWithTag:3] setHidden:NO];
+            
+            
+            // Remove the IconDownloader from the in progress list.
+            // This will result in it being deallocated.
+            [self.imageDownloadsInProgress removeObjectForKey:indexPath];
+            
+        }];
+        (self.imageDownloadsInProgress)[indexPath] = newsImageDownloader;
+        [newsImageDownloader beginDownload];
+    }
+}
+
 
 -(void)dealloc{
     [super dealloc];

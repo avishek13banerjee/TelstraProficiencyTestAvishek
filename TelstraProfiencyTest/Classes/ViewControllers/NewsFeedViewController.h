@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "AppHandler.h"
 #import "NewsModel.h"
+#import "NewsImageDownloader.h"
 
 
 @interface NewsFeedViewController : UIViewController<UITableViewDataSource,UITableViewDelegate>

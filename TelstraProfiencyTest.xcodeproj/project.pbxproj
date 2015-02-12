@@ -17,6 +17,7 @@
 		441AB1A91A8C841A00048EFD /* NewsFeedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 441AB1A81A8C841A00048EFD /* NewsFeedViewController.m */; };
 		441AB1AD1A8C86BB00048EFD /* AppHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 441AB1AC1A8C86BB00048EFD /* AppHandler.m */; };
 		44499EA51A8C90310016DADD /* NewsFeedTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 44499EA41A8C90310016DADD /* NewsFeedTableViewCell.m */; };
+		44499EA81A8C97B10016DADD /* NewsImageDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 44499EA71A8C97B10016DADD /* NewsImageDownloader.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +51,8 @@
 		441AB1AC1A8C86BB00048EFD /* AppHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppHandler.m; path = Classes/Controllers/AppHandler.m; sourceTree = "<group>"; };
 		44499EA31A8C90310016DADD /* NewsFeedTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NewsFeedTableViewCell.h; path = Classes/CustomCell/NewsFeedTableViewCell.h; sourceTree = "<group>"; };
 		44499EA41A8C90310016DADD /* NewsFeedTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NewsFeedTableViewCell.m; path = Classes/CustomCell/NewsFeedTableViewCell.m; sourceTree = "<group>"; };
+		44499EA61A8C97B10016DADD /* NewsImageDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NewsImageDownloader.h; path = Classes/Controllers/NewsImageDownloader.h; sourceTree = "<group>"; };
+		44499EA71A8C97B10016DADD /* NewsImageDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NewsImageDownloader.m; path = Classes/Controllers/NewsImageDownloader.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +166,8 @@
 				441AB19F1A8C80CE00048EFD /* ViewControllers */,
 				441AB1AB1A8C86BB00048EFD /* AppHandler.h */,
 				441AB1AC1A8C86BB00048EFD /* AppHandler.m */,
+				44499EA61A8C97B10016DADD /* NewsImageDownloader.h */,
+				44499EA71A8C97B10016DADD /* NewsImageDownloader.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -282,6 +287,7 @@
 				441AB1AD1A8C86BB00048EFD /* AppHandler.m in Sources */,
 				441AB1A21A8C811200048EFD /* SplashScreenViewController.m in Sources */,
 				44499EA51A8C90310016DADD /* NewsFeedTableViewCell.m in Sources */,
+				44499EA81A8C97B10016DADD /* NewsImageDownloader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
