@@ -12,6 +12,7 @@ static NSString *CellIdentifier = @"NewsCell";
 static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
 @interface NewsFeedViewController (){
     UIRefreshControl *refreshControl;
+    NSMutableArray *newsModelArray;
     
 }
 // the set of NewsImageDownloader objects for each NewsObject
@@ -57,7 +58,28 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
 
 
 -(void)refresh{
-    [newsTable reloadData];
+    //[newsTable reloadData];
+    
+    self.jsonDownload = [NSMutableData data];
+    
+    if (newsModelArray == nil) {
+        newsModelArray = [[NSMutableArray alloc]init];
+        
+    }
+    
+    
+    
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://dl.dropboxusercontent.com/s/g41ldl6t0afw9dv/facts.json"] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10.0];
+    
+    
+    // alloc+init and start an NSURLConnection; release on completion/failure
+    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    self.jsonConnection = conn;
+    [conn start];
+    
+    
+    
     [refreshControl endRefreshing];
 }
 - (void)didReceiveMemoryWarning{
@@ -297,11 +319,110 @@ static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
 }
 
 
+#pragma mark - NSURLConnectionDelegate
+
+// -------------------------------------------------------------------------------
+//	Downloading Data and appending to image
+// -------------------------------------------------------------------------------
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+    [self.jsonDownload appendData:data];
+}
+
+// -------------------------------------------------------------------------------
+//	reflush
+// -------------------------------------------------------------------------------
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+{
+    // Clear the activeDownload property to allow later attempts
+    self.jsonDownload = nil;
+    
+    // Release the connection now that it's finished
+    
+    [self.jsonDownload release];
+    self.jsonDownload = nil;
+
+
+    
+    
+   
+    
+}
+
+// -------------------------------------------------------------------------------
+//	connectionDidFinishLoading:connection
+// -------------------------------------------------------------------------------
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+    // Set appIcon and clear temporary data/image
+    NSError *error = nil;
+    
+    NSDictionary *array =[[NSDictionary alloc]init];
+    array = [NSJSONSerialization JSONObjectWithData:self.jsonDownload options:NSJSONReadingMutableContainers error:&error]; // Try to convert your data
+    if (!array && error && [error.domain isEqualToString:NSCocoaErrorDomain] && (error.code == NSPropertyListReadCorruptError)) {
+        // Encoding issue, try Latin-1
+        NSString *jsonString = [[NSString alloc] initWithData:self.jsonDownload encoding:NSISOLatin1StringEncoding];
+        if (jsonString) {
+            // Need to re-encode as UTF8 to parse
+            array = [NSJSONSerialization JSONObjectWithData:
+                     [jsonString dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES]
+                                                    options:0 error:&error];
+        }
+    }
+    
+    NSString *title = [array objectForKey:@"title"];
+    
+    NSArray *rows = [array objectForKey:@"rows"];
+    
+    if (rows.count>0) {
+        [newsModelArray removeAllObjects];
+    
+    for (int i = 0; i<rows.count; i++) {
+        NSDictionary *detailDictionary = [rows objectAtIndex:i];
+        NewsModel *newsModel = [[NewsModel alloc]init];
+        newsModel.title = [detailDictionary objectForKey:@"title"];
+        newsModel.description = [detailDictionary objectForKey:@"description"];
+        newsModel.imageReference = [detailDictionary objectForKey:@"imageHref"];
+        
+        if(!(newsModel.imageReference == (id)[NSNull null] || newsModel.imageReference.length == 0 ) || !(newsModel.title == (id)[NSNull null] || newsModel.title.length == 0 ) || !(newsModel.description == (id)[NSNull null] || newsModel.description.length == 0 ))
+            [newsModelArray addObject:newsModel];
+        
+    }
+    
+    
+    
+    apphandler = [AppHandler sharedManager];
+    apphandler.titleString = title;
+    apphandler.newsModelArray = [newsModelArray retain];
+
+    }
+    
+    
+    
+    
+    //self.jsonDownload = nil;
+    
+    [self.newsTable reloadData];
+    
+    
+    
+    
+    
+}
+
+
+
+
+
+
 -(void)dealloc{
     [super dealloc];
     if(refreshControl != nil)
         [refreshControl release];
     refreshControl  = nil;
 }
+
+
+
 
 @end

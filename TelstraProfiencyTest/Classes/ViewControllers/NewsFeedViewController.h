@@ -19,5 +19,8 @@
 }
 
 @property (nonatomic,strong) UITableView *newsTable;
+@property (nonatomic, strong) NSURLConnection *jsonConnection;
+@property (nonatomic, strong) NSMutableData *jsonDownload;
+
 
 @end
