@@ -7,16 +7,22 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
 
 @interface NewsModel : NSObject
 {
-    NSString *title;
-    NSString *description;
-    NSString *imageReference;
+
+    
+    
 }
 
 @property (nonatomic,strong)NSString *title;
 @property (nonatomic,strong)NSString *description;
 @property (nonatomic,strong)NSString *imageReference;
+@property (nonatomic, strong) UIImage *newsImage;
+
+
+
 
 @end

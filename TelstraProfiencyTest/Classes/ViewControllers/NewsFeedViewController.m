@@ -8,6 +8,8 @@
 
 #import "NewsFeedViewController.h"
 
+static NSString *CellIdentifier = @"NewsCell";
+static NSString *PlaceholderCellIdentifier = @"PlaceholderCell";
 @interface NewsFeedViewController (){
     UIRefreshControl *refreshControl;
 }
@@ -15,6 +17,7 @@
 
 @implementation NewsFeedViewController
 @synthesize newsTable;
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -43,6 +46,9 @@
     [newsTable addSubview:refreshControl];
     
     self.title = apphandler.titleString;
+    
+    [newsTable registerClass:[UITableViewCell class] forCellReuseIdentifier:CellIdentifier];
+    [newsTable registerClass:[UITableViewCell class] forCellReuseIdentifier:PlaceholderCellIdentifier];
     
 }
 
@@ -119,6 +125,8 @@
     
     UITableViewCell *cell  = [tableView dequeueReusableCellWithIdentifier:@"newsCell"];
     
+    
+    if(cell == nil)
     {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"newsCell"];
         cell.backgroundColor =  [UIColor clearColor];
@@ -146,15 +154,37 @@
         float totalHeight = expectedAnotherSize.height + expectedLabelSize.height;
     }
     
+
+    
+    
+    if([cell.contentView viewWithTag:1] == nil){
     UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(10, 5, cell.frame.size.width-40, expectedLabelSize.height)];
     [titleLabel setLineBreakMode:NSLineBreakByWordWrapping];
     [titleLabel setFont:[UIFont boldSystemFontOfSize:18.0f]];
     [titleLabel setTextColor:[UIColor blueColor]];
+    titleLabel.tag = 1;
+        if(!(news.title == (id)[NSNull null] || news.title.length == 0 ))
+            [titleLabel setText:news.title];
+        
+        
+        [cell.contentView addSubview:titleLabel];
+        
+    }
     
-    if(!(news.title == (id)[NSNull null] || news.title.length == 0 ))
-        [titleLabel setText:news.title];
+    else {
     
-    UILabel *descriptionLabel =[[UILabel alloc]initWithFrame:CGRectMake(10, titleLabel.frame.origin.y + titleLabel.frame.size.height+10, cell.frame.size.width-120, expectedAnotherSize.height+20.0)];
+        [(UILabel *)[cell.contentView viewWithTag:1] setText:news.title];
+        [(UILabel *)[cell.contentView viewWithTag:1] setFrame:CGRectMake(10, 5, cell.frame.size.width-40, expectedLabelSize.height)];
+        
+        
+        
+    
+    }
+    
+    
+
+    if([cell.contentView viewWithTag:2] == nil){
+    UILabel *descriptionLabel =[[UILabel alloc]initWithFrame:CGRectMake(10, [cell.contentView viewWithTag:1 ].frame.origin.y + [cell.contentView viewWithTag:1 ].frame.size.height+10, cell.frame.size.width-120, expectedAnotherSize.height+20.0)];
     
     [descriptionLabel setLineBreakMode:NSLineBreakByWordWrapping];
     if(!(news.description == (id)[NSNull null] || news.description.length == 0 ))
@@ -165,17 +195,29 @@
     [descriptionLabel setFont:font1];
     [descriptionLabel setLineBreakMode:NSLineBreakByWordWrapping];
     [descriptionLabel setNumberOfLines:500];
+     descriptionLabel.tag = 2;
+        
+
+        [cell.contentView addSubview:descriptionLabel];
+    }
+    
+    else{
+        [(UILabel *)[cell.contentView viewWithTag:2] setText:news.description];
+        [(UILabel *)[cell.contentView viewWithTag:2] setFrame:CGRectMake(10, [cell.contentView viewWithTag:1 ].frame.origin.y + [cell.contentView viewWithTag:1 ].frame.size.height+10, cell.frame.size.width-120, expectedAnotherSize.height+20.0)];
+        
+    
+    }
     
     
-    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(descriptionLabel.frame.origin.x + descriptionLabel.frame.size.width, 30, 100, 100)];
+    
+    UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake([cell.contentView viewWithTag:2].frame.origin.x + [cell.contentView viewWithTag:1].frame.size.width, 30, 100, 100)];
     if(!(news.imageReference == (id)[NSNull null] || news.imageReference.length == 0 ))
         
-        
-    [titleLabel setBackgroundColor:[UIColor clearColor]];
+        imageView.tag = 3;
     
-    [cell.contentView addSubview:imageView];
-    [cell.contentView addSubview:titleLabel];
-    [cell.contentView addSubview:descriptionLabel];
+    [[cell.contentView viewWithTag:1] setBackgroundColor:[UIColor clearColor]];
+    
+
     [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
     
     // [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];

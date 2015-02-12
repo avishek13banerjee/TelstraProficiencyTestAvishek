@@ -1,16 +1,16 @@
 //
-//  NewsModel.m
+//  NewsFeedTableViewCell.h
 //  TelstraProfiencyTest
 //
 //  Created by Avishek Banerjee on 12/02/2015.
 //  Copyright (c) 2015 Cognizant. All rights reserved.
 //
 
-#import "NewsModel.h"
+#import <UIKit/UIKit.h>
 
-@implementation NewsModel
+@interface NewsFeedTableViewCell : UITableViewCell
 
-@synthesize title,description,imageReference,newsImage;
+
+
 
 @end
-
